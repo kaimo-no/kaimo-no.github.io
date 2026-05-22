@@ -586,8 +586,8 @@
   </div>
   <h1>Give your AI agent<br><span class="grad">a checkout.</span></h1>
   <p class="hero-sub">
-    The checkout tool your agent calls. MCP server (Claude · Cursor · Windsurf)
-    or CLI. One tool, every shop. Routing handled server-side.
+    The checkout tool your agent calls. MCP server for any agent, or CLI.
+    One tool, every shop. Routing handled server-side.
   </p>
 
   <form class="waitlist-form" id="hero-form"
@@ -604,9 +604,13 @@
   <p class="waitlist-note">API key sent when your slot opens.</p>
 
   <div class="code-preview">
-    <div class="code-label">MCP — one line, three tools</div>
-<pre><span class="c-cmt"># Any MCP-capable agent — Claude Code, Cursor, Windsurf, OpenClaw, Hermes agent.</span>
-<span class="c-fn">$</span> claude mcp add kaimo --env KAIMO_API_KEY=k_… -- kaimo-mcp
+    <div class="code-label">MCP — drop into any client config</div>
+<pre><span class="c-cmt"># Works with any MCP-capable agent.</span>
+<span class="c-brace">{</span> <span class="c-key">"mcpServers"</span><span class="c-brace">:</span> <span class="c-brace">{</span>
+    <span class="c-key">"kaimo"</span><span class="c-brace">:</span> <span class="c-brace">{</span>
+      <span class="c-key">"command"</span><span class="c-brace">:</span> <span class="c-str">"kaimo-mcp"</span><span class="c-brace">,</span>
+      <span class="c-key">"env"</span><span class="c-brace">:</span> <span class="c-brace">{</span> <span class="c-key">"KAIMO_API_KEY"</span><span class="c-brace">:</span> <span class="c-str">"k_…"</span> <span class="c-brace">}</span>
+    <span class="c-brace">}</span> <span class="c-brace">}</span> <span class="c-brace">}</span>
 
 <span class="c-cmt"># Your agent now has three tools:</span>
 <span class="c-cmt">#   kaimo_preview  — quote, no charge</span>
@@ -654,7 +658,7 @@
     <div class="step">
       <div class="step-num">05 — Place</div>
       <h3>Order at merchant</h3>
-      <p>Shopify drops into a prefilled cart. Others finish on kaimo's merchant-of-record account via a single-use virtual card.</p>
+      <p>Shopify drops into a prefilled cart. Others finish on kaimo's merchant-of-record account via a virtual card.</p>
     </div>
   </div>
 </section>
@@ -734,32 +738,27 @@
     <div class="feature">
       <div class="feature-icon icon-orange">🔌</div>
       <h3>MCP server (stdio)</h3>
-      <p>Three tools: <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. One <code>claude mcp add</code> line. Responses inline a product image + markdown card.</p>
+      <p>Three tools: <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. One entry in your MCP client config. Responses inline a product image + markdown card.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-blue">💻</div>
       <h3>CLI</h3>
-      <p>Pass a BuyRequest to <code>kaimo buy</code>. Response on stdout, errors on stderr. Exit codes: <code>0</code> ok, <code>2</code> validation, <code>3</code> network.</p>
+      <p>Pass a BuyRequest to <code>kaimo buy</code>. Get a JSON response back.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-purple">🛒</div>
-      <h3>Five source families</h3>
-      <p>Shopify, WooCommerce, Squarespace, Amazon UK, plus JSON-LD fallback for Wix &amp; friends.</p>
+      <h3>Supported stores</h3>
+      <p>Shopify, WooCommerce, Squarespace today. More coming soon — Amazon, ASOS, Zalando, and the JSON-LD fallback for Wix &amp; friends.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-yellow">🧾</div>
       <h3>Merchant-of-record</h3>
-      <p>Buyer pays Stripe; we pay the merchant via a single-use virtual card. UK VAT handled.</p>
+      <p>Buyer pays Stripe; we pay the merchant via a virtual card. UK VAT handled.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-pink">🛡️</div>
       <h3>Price drift protection</h3>
       <p>&gt;5% drift from the quote auto-aborts. No surprise overcharges.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon icon-teal">🔑</div>
-      <h3>Bearer auth + rate limits</h3>
-      <p>Per-key token-bucket limits. Append-only Postgres ledger.</p>
     </div>
     <div class="feature feature-coming">
       <div class="feature-icon icon-teal">⛓️</div>
