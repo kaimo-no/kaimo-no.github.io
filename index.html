@@ -586,10 +586,8 @@
   </div>
   <h1>Give your AI agent<br><span class="grad">a checkout.</span></h1>
   <p class="hero-sub">
-    kaimo is the checkout tool your agent calls. Drop in the MCP server
-    (Claude · Cursor · Windsurf) or pipe JSON to the CLI — one tool, every shop.
-    Routing to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD
-    storefront happens server-side, invisible to the model.
+    The checkout tool your agent calls. MCP server (Claude · Cursor · Windsurf)
+    or stdin-JSON CLI. One tool, every shop. Routing handled server-side.
   </p>
 
   <form class="waitlist-form" id="hero-form"
@@ -603,10 +601,10 @@
     <button type="submit" class="btn-primary" id="hero-btn">Join waitlist</button>
   </form>
   <p class="form-status" id="hero-status"></p>
-  <p class="waitlist-note">No spam. API key sent when ready.</p>
+  <p class="waitlist-note">API key sent when your slot opens.</p>
 
   <div class="code-preview">
-    <div class="code-label">MCP — register once, agent calls forever</div>
+    <div class="code-label">MCP — one line, three tools</div>
 <pre><span class="c-cmt"># Claude Code, Claude Desktop, Cursor, Windsurf</span>
 <span class="c-fn">$</span> claude mcp add kaimo <span class="c-brace">\</span>
     --env KAIMO_API_KEY=k_<span class="c-cmt">…</span> <span class="c-brace">\</span>
@@ -619,7 +617,7 @@
   </div>
 
   <div class="code-preview code-preview-alt">
-    <div class="code-label">CLI — same surface, stdin JSON</div>
+    <div class="code-label">CLI — same surface</div>
 <pre><span class="c-fn">$</span> echo <span class="c-str">'{"product_url":"https://shop.example/widget","buyer":{…}}'</span> <span class="c-brace">\</span>
     | kaimo buy
 
@@ -632,34 +630,34 @@
 <!-- HOW IT WORKS -->
 <section id="how">
   <div class="section-label">How it works</div>
-  <h2>From agent tool call<br>to doorstep.</h2>
-  <p class="section-sub">The agent calls one tool. The five steps below all happen server-side.</p>
+  <h2>From tool call<br>to doorstep.</h2>
+  <p class="section-sub">One tool call. Five steps, all server-side.</p>
 
   <div class="steps">
     <div class="step">
       <div class="step-num">01 — Invoke</div>
       <h3>Agent calls <code>kaimo_buy</code></h3>
-      <p>Through the MCP server (Claude · Cursor · Windsurf) or our stdin-JSON CLI. One tool name, any merchant URL. No per-shop schemas burning context.</p>
+      <p>MCP or CLI. One tool name, any merchant URL.</p>
     </div>
     <div class="step">
       <div class="step-num">02 — Resolve</div>
-      <h3>Product URL → structured data</h3>
-      <p>We extract title, price, variant ID, and ASIN from any supported merchant — no scraper setup required on your side.</p>
+      <h3>URL → product data</h3>
+      <p>Title, price, variant ID extracted automatically.</p>
     </div>
     <div class="step">
       <div class="step-num">03 — Quote</div>
       <h3>Transparent pricing</h3>
-      <p>Subtotal + shipping returned before charge. Drift &gt;5% from resolver price aborts the order automatically.</p>
+      <p>Subtotal + shipping before charge. &gt;5% drift auto-aborts.</p>
     </div>
     <div class="step">
       <div class="step-num">04 — Charge</div>
       <h3>Stripe authorise</h3>
-      <p>Buyer is authorised via Stripe with manual capture so we hold the funds without committing them — captured the moment the merchant order is placed. An x402 USDC rail is on the way for stablecoin-holding agents.</p>
+      <p>Manual capture — funds held, captured when the merchant order lands.</p>
     </div>
     <div class="step">
       <div class="step-num">05 — Place</div>
-      <h3>Order placed at merchant</h3>
-      <p>Shopify orders land in a prefilled cart permalink ready for checkout. Amazon UK and queued sources finish via the kaimo merchant-of-record account, paid by a single-use Stripe Issuing virtual card.</p>
+      <h3>Order at merchant</h3>
+      <p>Shopify drops into a prefilled cart. Others finish on kaimo's merchant-of-record account via a single-use virtual card.</p>
     </div>
   </div>
 </section>
@@ -669,10 +667,9 @@
 <!-- TOKEN EFFICIENCY -->
 <section id="tokens">
   <div class="section-label">Token efficiency</div>
-  <h2>One tool definition.<br><span style="color:var(--accent2)">Every shop.</span></h2>
+  <h2>One tool.<br><span style="color:var(--accent2)">Every shop.</span></h2>
   <p class="section-sub">
-    LLMs pay the token cost of every tool schema on <em>every</em> inference call —
-    not just once. Fewer tools means cheaper, faster agents at scale.
+    Every tool schema is paid for on <em>every</em> inference call. Fewer tools = cheaper agents.
   </p>
 
   <div class="token-split">
@@ -705,8 +702,7 @@
         <div class="tool-row highlight">📦 kaimo_status<span class="ti">poll progress</span></div>
       </div>
       <p style="font-size:13px;color:var(--muted);margin-top:20px;line-height:1.7">
-        Routing to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD
-        store happens server-side — invisible to the model.
+        Routing happens server-side, invisible to the model.
       </p>
     </div>
   </div>
@@ -714,17 +710,17 @@
   <div class="token-saving">
     <div class="ts-stat">
       <div class="ts-num">88.94%</div>
-      <div class="ts-desc">aggregate token reduction (locked by the eval gate ≥40%)</div>
+      <div class="ts-desc">token reduction vs raw multi-tool</div>
     </div>
     <div class="ts-divider"></div>
     <div class="ts-stat">
       <div class="ts-num">3</div>
-      <div class="ts-desc">MCP tools to register, total</div>
+      <div class="ts-desc">MCP tools, total</div>
     </div>
     <div class="ts-divider"></div>
     <div class="ts-stat">
       <div class="ts-num">∞</div>
-      <div class="ts-desc">shops reachable without schema changes</div>
+      <div class="ts-desc">shops, no schema changes</div>
     </div>
   </div>
 </section>
@@ -735,43 +731,43 @@
 <section id="features">
   <div class="section-label">Features</div>
   <h2>Everything an agent<br>needs to buy.</h2>
-  <p class="section-sub">Built for LLM tool-use first. MCP and CLI are the integration paths; the HTTP API underneath is there if you want it.</p>
+  <p class="section-sub">Built for tool-use. MCP + CLI on top of an HTTP API.</p>
 
   <div class="features">
     <div class="feature">
       <div class="feature-icon icon-orange">🔌</div>
       <h3>MCP server (stdio)</h3>
-      <p>Drop-in MCP server exposes three tools — <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. One <code>claude mcp add</code> line and your agent has a checkout. Responses inline a product image + markdown purchase card so the agent shows the buyer what it's about to buy.</p>
+      <p>Three tools: <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. One <code>claude mcp add</code> line. Responses inline a product image + markdown card.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-blue">💻</div>
       <h3>Stdin-JSON CLI</h3>
-      <p>Pipe a BuyRequest JSON to <code>kaimo buy</code>, get a BuyResponse on stdout, errors on stderr. Stable exit codes: <code>0</code> ok, <code>2</code> validation/auth/price-drift, <code>3</code> network. Drop into any agent runtime that can shell out.</p>
+      <p>Pipe BuyRequest to <code>kaimo buy</code>. Response on stdout, errors on stderr. Exit codes: <code>0</code> ok, <code>2</code> validation, <code>3</code> network.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-purple">🛒</div>
       <h3>Five source families</h3>
-      <p>Shopify, WooCommerce, Squarespace, Amazon UK, plus a Schema.org JSON-LD fallback that covers Wix and most modern storefronts. One tool, five resolvers.</p>
+      <p>Shopify, WooCommerce, Squarespace, Amazon UK, plus JSON-LD fallback for Wix &amp; friends.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-yellow">🧾</div>
       <h3>Merchant-of-record</h3>
-      <p>Buyer pays Stripe; we pay the merchant with a single-use Stripe Issuing virtual card scoped to the quote total. UK VAT on the service fee is on us — no marketplace account needed on your end.</p>
+      <p>Buyer pays Stripe; we pay the merchant via a single-use virtual card. UK VAT handled.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-pink">🛡️</div>
       <h3>Price drift protection</h3>
-      <p>Automatic abort if the live cart price drifts &gt;5% from the resolved quote. No surprise overcharges.</p>
+      <p>&gt;5% drift from the quote auto-aborts. No surprise overcharges.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-teal">🔑</div>
       <h3>Bearer auth + rate limits</h3>
-      <p>Per-key token-bucket rate limiting. Each API key maps to an enterprise account in the append-only Postgres ledger.</p>
+      <p>Per-key token-bucket limits. Append-only Postgres ledger.</p>
     </div>
     <div class="feature feature-coming">
       <div class="feature-icon icon-teal">⛓️</div>
-      <h3>x402 USDC payment <span class="coming-chip">Coming soon</span></h3>
-      <p>A second payment rail for agents that hold stablecoins — same tool surface, no Stripe handle, no card on file. Not implemented yet; on the roadmap to settle on Base.</p>
+      <h3>x402 USDC <span class="coming-chip">Coming soon</span></h3>
+      <p>Second rail for stablecoin-holding agents. Not built yet; planned on Base.</p>
     </div>
   </div>
 </section>
@@ -781,27 +777,30 @@
 <!-- MARKETS -->
 <section>
   <div class="section-label">Launch plan</div>
-  <h2>UK first. The rest follows.</h2>
-  <p class="section-sub">kaimo is in private beta — nothing is live in production yet. We're launching with UK delivery addresses on the merchant types below. US and Ireland shipping land once the UK rail is stable.</p>
+  <h2>UK first.</h2>
+  <p class="section-sub">Private beta — nothing live in production yet. UK delivery at launch.</p>
 
   <div class="market-group">
     <div class="market-group-label">At launch — UK delivery</div>
     <div class="markets">
-      <div class="market-pill"><span class="dot dot-live"></span> Shopify stores</div>
-      <div class="market-pill"><span class="dot dot-live"></span> WooCommerce stores</div>
-      <div class="market-pill"><span class="dot dot-live"></span> Squarespace stores</div>
-      <div class="market-pill"><span class="dot dot-live"></span> JSON-LD sources (Wix &amp; co.)</div>
+      <div class="market-pill"><span class="dot dot-live"></span> Shopify</div>
+      <div class="market-pill"><span class="dot dot-live"></span> WooCommerce</div>
+      <div class="market-pill"><span class="dot dot-live"></span> Squarespace</div>
+      <div class="market-pill"><span class="dot dot-live"></span> JSON-LD (Wix &amp; co.)</div>
     </div>
   </div>
 
   <div class="market-group">
-    <div class="market-group-label">Next — once UK is stable</div>
+    <div class="market-group-label">Next</div>
     <div class="markets">
-      <div class="market-pill"><span class="dot dot-coming"></span> Amazon UK (placer in v2)</div>
-      <div class="market-pill"><span class="dot dot-coming"></span> US &amp; IE shipping</div>
+      <div class="market-pill"><span class="dot dot-coming"></span> Amazon UK</div>
       <div class="market-pill"><span class="dot dot-coming"></span> Amazon DE</div>
       <div class="market-pill"><span class="dot dot-coming"></span> ASOS</div>
       <div class="market-pill"><span class="dot dot-coming"></span> Zalando</div>
+      <div class="market-pill"><span class="dot dot-coming"></span> Temu</div>
+      <div class="market-pill"><span class="dot dot-coming"></span> JoyBuy</div>
+      <div class="market-pill"><span class="dot dot-coming"></span> AliExpress</div>
+      <div class="market-pill"><span class="dot dot-coming"></span> eBay</div>
     </div>
   </div>
 </section>
@@ -812,7 +811,7 @@
 <div class="cta-section" id="waitlist">
   <div class="section-label" style="margin-bottom:14px">Early access</div>
   <h2>Be first to build<br>with kaimo.</h2>
-  <p class="section-sub">Join the waitlist. We'll send your API key when your slot opens.</p>
+  <p class="section-sub">Waitlist for early access. API key when your slot opens.</p>
 
   <form class="cta-form" id="cta-form"
         action="https://formspree.io/f/xnjrvong"
@@ -825,7 +824,7 @@
     <button type="submit" class="btn-primary" id="cta-btn">Get access</button>
   </form>
   <p class="form-status" id="cta-status"></p>
-  <p class="waitlist-note" style="text-align:center">Developer billing. Service fee owed by you, not the buyer.</p>
+  <p class="waitlist-note" style="text-align:center">Developer billing — service fee owed by you, not the buyer.</p>
 </div>
 
 <!-- FOOTER -->
