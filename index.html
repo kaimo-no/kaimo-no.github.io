@@ -5,19 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kaimo — Give your AI agent a checkout.</title>
 <meta name="description" content="One API call. Every shop. kaimo routes your agent's order to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD store. UK merchant-of-record with Stripe + x402 USDC payment rails.">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:       #0a0a0f;
-    --surface:  #111118;
-    --border:   #1e1e2e;
-    --muted:    #3a3a5c;
-    --text:     #e8e8f0;
-    --sub:      #8888aa;
-    --accent:   #6c63ff;
-    --accent2:  #00d4aa;
-    --danger:   #ff4d6d;
+    /* palette derived from the kaimo logo: deep navy on warm cream */
+    --bg:       #f5efdc;  /* cream — logo background */
+    --surface:  #fbf8ee;  /* lighter cream for panels */
+    --border:   #e6dec3;  /* warm cream border */
+    --muted:    #a89e80;  /* warm beige-grey */
+    --text:     #1f2855;  /* navy — logo mark */
+    --sub:      #5a6390;  /* lighter navy for secondary copy */
+    --accent:   #2a3470;  /* logo navy, slightly brighter for buttons */
+    --accent2:  #c9a86a;  /* warm gold — secondary highlight */
+    --danger:   #b94747;  /* muted brick red */
     --mono:     ui-monospace, Menlo, 'Cascadia Code', monospace;
     --sans:     -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
     --radius:   12px;
@@ -39,20 +42,26 @@
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 40px;
-    background: rgba(10,10,15,0.85);
+    padding: 14px 40px;
+    background: rgba(245, 239, 220, 0.85);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
   }
   .nav-logo {
+    display: inline-flex; align-items: center; gap: 10px;
     font-family: var(--mono);
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text);
     text-decoration: none;
     letter-spacing: -0.5px;
   }
-  .nav-logo span { color: var(--accent); }
+  .nav-logo img {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    display: block;
+  }
+  .nav-logo span { color: var(--accent2); }
   .nav-links { display: flex; gap: 28px; align-items: center; }
   .nav-links a {
     color: var(--sub);
@@ -91,20 +100,20 @@
   }
   .hero::before {
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(108,99,255,.18) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(31, 40, 85, 0.08) 0%, transparent 70%);
     top: -100px; left: -100px;
   }
   .hero::after {
     width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(0,212,170,.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(201, 168, 106, 0.18) 0%, transparent 70%);
     bottom: 0; right: -100px;
   }
 
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(108,99,255,.12);
-    border: 1px solid rgba(108,99,255,.3);
-    color: #a8a4ff;
+    background: rgba(31, 40, 85, 0.08);
+    border: 1px solid rgba(31, 40, 85, 0.18);
+    color: var(--accent);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: .5px;
@@ -115,7 +124,7 @@
   }
   .badge-dot {
     width: 6px; height: 6px;
-    background: var(--accent2);
+    background: #1b6e4f;
     border-radius: 50%;
     animation: pulse 2s infinite;
   }
@@ -168,7 +177,7 @@
   .waitlist-form input[type=email]::placeholder { color: var(--muted); }
   .waitlist-form input[type=email]:focus { border-color: var(--accent); }
   .btn-primary {
-    background: linear-gradient(135deg, var(--accent), #9b6bff);
+    background: var(--accent);
     color: #fff;
     border: none;
     font-family: var(--sans);
@@ -178,7 +187,8 @@
     border-radius: 10px;
     cursor: pointer;
     white-space: nowrap;
-    transition: opacity .2s, transform .15s;
+    transition: opacity .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 1px 0 rgba(31, 40, 85, 0.4) inset, 0 2px 8px rgba(31, 40, 85, 0.12);
   }
   .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
   .btn-primary:active { transform: translateY(0); }
@@ -193,7 +203,7 @@
     min-height: 20px;
     transition: opacity .3s;
   }
-  .form-status.success { color: var(--accent2); }
+  .form-status.success { color: #1b6e4f; }
   .form-status.error   { color: var(--danger); }
 
   /* ── CODE PREVIEW ── */
@@ -234,12 +244,12 @@
     height: 1px;
     background: var(--border);
   }
-  .c-key    { color: #a8a4ff; }
-  .c-str    { color: #7cdfb3; }
+  .c-key    { color: #2a3470; }
+  .c-str    { color: #0f7b3d; }
   .c-brace  { color: var(--sub); }
-  .c-num    { color: #f7c873; }
+  .c-num    { color: #a05a1f; }
   .c-cmt    { color: var(--muted); font-style: italic; }
-  .c-fn     { color: #ff9f7e; }
+  .c-fn     { color: #8c4a1f; }
 
   /* ── SECTION LAYOUT ── */
   section {
@@ -286,7 +296,7 @@
     position: relative;
     transition: background .2s;
   }
-  .step:hover { background: #16161f; }
+  .step:hover { background: #fffcf1; }
   .step-num {
     font-family: var(--mono);
     font-size: 11px;
@@ -337,12 +347,12 @@
   }
   .feature p { font-size: 14px; color: var(--sub); line-height: 1.7; }
 
-  .icon-purple { background: rgba(108,99,255,.15); }
-  .icon-teal   { background: rgba(0,212,170,.15); }
-  .icon-orange { background: rgba(255,159,126,.15); }
-  .icon-pink   { background: rgba(255,77,109,.15); }
-  .icon-yellow { background: rgba(247,200,115,.15); }
-  .icon-blue   { background: rgba(100,180,255,.15); }
+  .icon-purple { background: rgba(31, 40, 85, 0.10); }
+  .icon-teal   { background: rgba(15, 123, 61, 0.14); }
+  .icon-orange { background: rgba(160, 90, 31, 0.16); }
+  .icon-pink   { background: rgba(185, 71, 71, 0.14); }
+  .icon-yellow { background: rgba(201, 168, 106, 0.28); }
+  .icon-blue   { background: rgba(74, 109, 167, 0.14); }
 
   /* ── MARKETS ── */
   .markets {
@@ -363,14 +373,14 @@
     width: 8px; height: 8px;
     border-radius: 50%;
   }
-  .dot-live    { background: var(--accent2); }
+  .dot-live    { background: #1b6e4f; }
   .dot-coming  { background: var(--muted); }
 
   /* ── CTA BOTTOM ── */
   .cta-section {
     text-align: center;
     padding: 120px 24px;
-    background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,.12) 0%, transparent 70%);
+    background: radial-gradient(ellipse at 50% 0%, rgba(201, 168, 106, 0.22) 0%, transparent 70%);
     border-top: 1px solid var(--border);
     position: relative;
   }
@@ -445,10 +455,10 @@
     position: relative;
     overflow: hidden;
   }
-  .token-panel.before { opacity: .75; }
+  .token-panel.before { opacity: .85; }
   .token-panel.after  {
-    border-color: rgba(108,99,255,.5);
-    box-shadow: 0 0 40px rgba(108,99,255,.08);
+    border-color: rgba(31, 40, 85, 0.35);
+    box-shadow: 0 0 40px rgba(201, 168, 106, 0.18);
   }
   .token-panel.after::before {
     content: '';
@@ -475,13 +485,13 @@
     padding: 4px 10px;
     border-radius: 6px;
   }
-  .tp-counter.high  { background: rgba(255,77,109,.15); color: #ff9faf; }
-  .tp-counter.low   { background: rgba(0,212,170,.15);  color: var(--accent2); }
+  .tp-counter.high  { background: rgba(185, 71, 71, 0.14); color: #8a3333; }
+  .tp-counter.low   { background: rgba(15, 123, 61, 0.16); color: #0f7b3d; }
 
   .tool-list { display: flex; flex-direction: column; gap: 8px; }
   .tool-row {
     display: flex; align-items: center; gap: 10px;
-    background: rgba(255,255,255,.03);
+    background: rgba(31, 40, 85, 0.03);
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 9px 14px;
@@ -491,11 +501,11 @@
   }
   .tool-row .ti { color: var(--muted); font-size: 11px; margin-left: auto; }
   .tool-row.highlight {
-    border-color: rgba(108,99,255,.4);
-    background: rgba(108,99,255,.06);
+    border-color: rgba(31, 40, 85, 0.35);
+    background: rgba(201, 168, 106, 0.14);
     color: var(--text);
   }
-  .tool-row.highlight .ti { color: var(--accent2); }
+  .tool-row.highlight .ti { color: #8c6a2a; }
 
   .token-saving {
     margin-top: 48px;
@@ -531,7 +541,7 @@
 
 <!-- NAV -->
 <nav>
-  <a href="/" class="nav-logo">kai<span>mo</span></a>
+  <a href="/" class="nav-logo"><img src="logo.png" alt="">kaimo</a>
   <div class="nav-links">
     <a href="#how">How it works</a>
     <a href="#tokens">Token savings</a>
