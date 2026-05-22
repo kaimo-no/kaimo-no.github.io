@@ -565,7 +565,7 @@
   </p>
 
   <form class="waitlist-form" id="hero-form"
-        action="https://formspree.io/f/REPLACE_WITH_FORMSPREE_ID"
+        action="https://formspree.io/f/xnjrvong"
         method="POST"
         onsubmit="submitWaitlist(event, 'hero-status', this)">
     <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
@@ -767,7 +767,7 @@
   <p class="section-sub">Join the waitlist. We'll send your API key when your slot opens.</p>
 
   <form class="cta-form" id="cta-form"
-        action="https://formspree.io/f/REPLACE_WITH_FORMSPREE_ID"
+        action="https://formspree.io/f/xnjrvong"
         method="POST"
         onsubmit="submitWaitlist(event, 'cta-status', this)">
     <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
@@ -803,13 +803,6 @@ async function submitWaitlist(e, statusId, form) {
   // honeypot — bots filling the hidden _gotcha field get silently dropped
   const gotcha = form.querySelector('input[name=_gotcha]');
   if (gotcha && gotcha.value) return;
-
-  // form action must be a real Formspree endpoint
-  if (form.action.includes('REPLACE_WITH_FORMSPREE_ID')) {
-    status.className = 'form-status error';
-    status.textContent = 'Waitlist not wired yet — replace REPLACE_WITH_FORMSPREE_ID in index.html.';
-    return;
-  }
 
   btn.disabled = true;
   btn.textContent = 'Joining…';
