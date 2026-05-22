@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>kaimo — Give your AI agent a checkout.</title>
-<meta name="description" content="One API call. Every shop. kaimo routes your agent's order to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD store. UK merchant-of-record with Stripe + x402 USDC payment rails.">
+<meta name="description" content="One MCP tool. Every shop. kaimo routes your agent's order to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD store. UK merchant-of-record on Stripe.">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="logo.png">
 <style>
@@ -348,6 +348,22 @@
     letter-spacing: -.3px;
   }
   .feature p { font-size: 14px; color: var(--sub); line-height: 1.7; }
+  .feature-coming { opacity: .72; }
+  .coming-chip {
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: middle;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: rgba(168, 158, 128, 0.18);
+    border: 1px solid rgba(168, 158, 128, 0.4);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
 
   .icon-purple { background: rgba(31, 40, 85, 0.10); }
   .icon-teal   { background: rgba(15, 123, 61, 0.14); }
@@ -628,8 +644,8 @@
     </div>
     <div class="step">
       <div class="step-num">04 — Charge</div>
-      <h3>Stripe or x402 USDC</h3>
-      <p>Authorise the buyer via Stripe (manual capture) or x402 USDC. Same endpoint, same response shape — the agent picks the rail by header.</p>
+      <h3>Stripe authorise</h3>
+      <p>Buyer is authorised via Stripe with manual capture so we hold the funds without committing them — captured the moment the merchant order is placed. An x402 USDC rail is on the way for stablecoin-holding agents.</p>
     </div>
     <div class="step">
       <div class="step-num">05 — Place</div>
@@ -743,10 +759,10 @@
       <h3>Bearer auth + rate limits</h3>
       <p>Per-key token-bucket rate limiting. Each API key maps to an enterprise account in the append-only Postgres ledger.</p>
     </div>
-    <div class="feature">
+    <div class="feature feature-coming">
       <div class="feature-icon icon-teal">⛓️</div>
-      <h3>x402 USDC payment</h3>
-      <p>Second payment rail behind the same tool surface. Agents that hold stablecoins pay directly — no Stripe handle, no card on file. PoC today; settles on Base.</p>
+      <h3>x402 USDC payment <span class="coming-chip">Coming soon</span></h3>
+      <p>A second payment rail for agents that hold stablecoins — same tool surface, no Stripe handle, no card on file. Not implemented yet; on the roadmap to settle on Base.</p>
     </div>
   </div>
 </section>
