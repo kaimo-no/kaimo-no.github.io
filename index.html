@@ -228,6 +228,8 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
   }
+  .code-preview-alt { margin-top: 16px; }
+  .code-preview pre { white-space: pre-wrap; word-break: break-word; }
   .code-label {
     font-family: var(--sans);
     font-size: 11px;
@@ -555,13 +557,14 @@
 <div class="hero">
   <div class="badge">
     <span class="badge-dot"></span>
-    Private beta — UK
+    MCP server · CLI · UK private beta
   </div>
   <h1>Give your AI agent<br><span class="grad">a checkout.</span></h1>
   <p class="hero-sub">
-    One tool. Every shop. Your agent posts a product URL — we route to Shopify,
-    WooCommerce, Squarespace, Amazon UK, or any JSON-LD store. No per-marketplace
-    schemas burning tokens on every inference call.
+    kaimo is the checkout tool your agent calls. Drop in the MCP server
+    (Claude · Cursor · Windsurf) or pipe JSON to the CLI — one tool, every shop.
+    Routing to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD
+    storefront happens server-side, invisible to the model.
   </p>
 
   <form class="waitlist-form" id="hero-form"
@@ -578,48 +581,58 @@
   <p class="waitlist-note">No spam. API key sent when ready.</p>
 
   <div class="code-preview">
-    <div class="code-label">POST /buy/</div>
-<pre><span class="c-brace">{</span>
-  <span class="c-key">"product_url"</span><span class="c-brace">:</span> <span class="c-str">"https://www.amazon.co.uk/dp/B08N5WRWNW"</span><span class="c-brace">,</span>
-  <span class="c-key">"quantity"</span><span class="c-brace">:</span> <span class="c-num">1</span><span class="c-brace">,</span>
-  <span class="c-key">"buyer"</span><span class="c-brace">: {</span>
-    <span class="c-key">"first_name"</span><span class="c-brace">:</span> <span class="c-str">"Alice"</span><span class="c-brace">,</span>
-    <span class="c-key">"email"</span><span class="c-brace">:</span>      <span class="c-str">"alice@example.com"</span><span class="c-brace">,</span>
-    <span class="c-key">"address1"</span><span class="c-brace">:</span>   <span class="c-str">"10 Downing Street"</span><span class="c-brace">,</span>
-    <span class="c-key">"city"</span><span class="c-brace">:</span>       <span class="c-str">"London"</span><span class="c-brace">,</span>
-    <span class="c-key">"postcode"</span><span class="c-brace">:</span>   <span class="c-str">"SW1A 2AA"</span><span class="c-brace">,</span>
-    <span class="c-key">"country"</span><span class="c-brace">:</span>    <span class="c-str">"GB"</span>
-  <span class="c-brace">}</span>
-<span class="c-brace">}</span>
+    <div class="code-label">MCP — register once, agent calls forever</div>
+<pre><span class="c-cmt"># Claude Code, Claude Desktop, Cursor, Windsurf</span>
+<span class="c-fn">$</span> claude mcp add kaimo <span class="c-brace">\</span>
+    --env KAIMO_API_KEY=k_<span class="c-cmt">…</span> <span class="c-brace">\</span>
+    -- kaimo-mcp
 
-<span class="c-cmt">// → { "order_id": "ord_…", "status": "placed", "pricing": { … } }</span></pre>
+<span class="c-cmt"># Your agent now has three tools:</span>
+<span class="c-cmt">#   kaimo_preview  — quote, no charge</span>
+<span class="c-cmt">#   kaimo_buy      — place an order</span>
+<span class="c-cmt">#   kaimo_status   — poll order progress</span></pre>
+  </div>
+
+  <div class="code-preview code-preview-alt">
+    <div class="code-label">CLI — same surface, stdin JSON</div>
+<pre><span class="c-fn">$</span> echo <span class="c-str">'{"product_url":"https://shop.example/widget","buyer":{…}}'</span> <span class="c-brace">\</span>
+    | kaimo buy
+
+<span class="c-brace">{</span> <span class="c-key">"order_id"</span><span class="c-brace">:</span> <span class="c-str">"ord_01HX…"</span><span class="c-brace">,</span>
+  <span class="c-key">"status"</span><span class="c-brace">:</span>   <span class="c-str">"in_cart"</span><span class="c-brace">,</span>
+  <span class="c-key">"checkout_url"</span><span class="c-brace">:</span> <span class="c-str">"https://shop.example/cart/…"</span> <span class="c-brace">}</span></pre>
   </div>
 </div>
 
 <!-- HOW IT WORKS -->
 <section id="how">
   <div class="section-label">How it works</div>
-  <h2>From URL to doorstep<br>in milliseconds.</h2>
-  <p class="section-sub">Your agent stays focused on decisions. We handle the rest.</p>
+  <h2>From agent tool call<br>to doorstep.</h2>
+  <p class="section-sub">The agent calls one tool. The five steps below all happen server-side.</p>
 
   <div class="steps">
     <div class="step">
-      <div class="step-num">01 — Resolve</div>
-      <h3>Product URL → structured data</h3>
-      <p>We extract title, price, variant ID, and ASIN from any supported marketplace — no scraper setup required.</p>
+      <div class="step-num">01 — Invoke</div>
+      <h3>Agent calls <code>kaimo_buy</code></h3>
+      <p>Through the MCP server (Claude · Cursor · Windsurf) or our stdin-JSON CLI. One tool name, any merchant URL. No per-shop schemas burning context.</p>
     </div>
     <div class="step">
-      <div class="step-num">02 — Quote</div>
+      <div class="step-num">02 — Resolve</div>
+      <h3>Product URL → structured data</h3>
+      <p>We extract title, price, variant ID, and ASIN from any supported merchant — no scraper setup required on your side.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03 — Quote</div>
       <h3>Transparent pricing</h3>
       <p>Subtotal + shipping returned before charge. Drift &gt;5% from resolver price aborts the order automatically.</p>
     </div>
     <div class="step">
-      <div class="step-num">03 — Charge</div>
+      <div class="step-num">04 — Charge</div>
       <h3>Stripe or x402 USDC</h3>
-      <p>Authorise the buyer via Stripe (manual capture) or x402 USDC. Same endpoint, same response shape — your agent picks the rail by header.</p>
+      <p>Authorise the buyer via Stripe (manual capture) or x402 USDC. Same endpoint, same response shape — the agent picks the rail by header.</p>
     </div>
     <div class="step">
-      <div class="step-num">04 — Place</div>
+      <div class="step-num">05 — Place</div>
       <h3>Order placed at merchant</h3>
       <p>Shopify orders land in a prefilled cart permalink ready for checkout. Amazon UK and queued sources finish via the kaimo merchant-of-record account, paid by a single-use Stripe Issuing virtual card.</p>
     </div>
@@ -697,28 +710,23 @@
 <section id="features">
   <div class="section-label">Features</div>
   <h2>Everything an agent<br>needs to buy.</h2>
-  <p class="section-sub">Built for LLM tool-use. OpenAPI + MCP server included.</p>
+  <p class="section-sub">Built for LLM tool-use first. MCP and CLI are the integration paths; the HTTP API underneath is there if you want it.</p>
 
   <div class="features">
     <div class="feature">
+      <div class="feature-icon icon-orange">🔌</div>
+      <h3>MCP server (stdio)</h3>
+      <p>Drop-in MCP server exposes three tools — <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. One <code>claude mcp add</code> line and your agent has a checkout. Responses inline a product image + markdown purchase card so the agent shows the buyer what it's about to buy.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-blue">💻</div>
+      <h3>Stdin-JSON CLI</h3>
+      <p>Pipe a BuyRequest JSON to <code>kaimo buy</code>, get a BuyResponse on stdout, errors on stderr. Stable exit codes: <code>0</code> ok, <code>2</code> validation/auth/price-drift, <code>3</code> network. Drop into any agent runtime that can shell out.</p>
+    </div>
+    <div class="feature">
       <div class="feature-icon icon-purple">🛒</div>
       <h3>Five source families</h3>
-      <p>Shopify, WooCommerce, Squarespace, Amazon UK, plus a Schema.org JSON-LD fallback that covers Wix and most modern storefronts. One endpoint, five resolvers.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon icon-teal">⚡</div>
-      <h3>Single API call</h3>
-      <p>POST a product URL and a buyer dict. Preview endpoint returns a quote without charging. No session state, no cart bookkeeping.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon icon-orange">🔌</div>
-      <h3>MCP server included</h3>
-      <p>Stdio MCP server exposes three tools — <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. Drops into Claude Code, Claude Desktop, Cursor with a single config line. Responses inline product image + markdown purchase card.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon icon-blue">🔑</div>
-      <h3>Bearer auth + rate limits</h3>
-      <p>Per-key token-bucket rate limiting. Each API key maps to an enterprise account in the append-only Postgres ledger.</p>
+      <p>Shopify, WooCommerce, Squarespace, Amazon UK, plus a Schema.org JSON-LD fallback that covers Wix and most modern storefronts. One tool, five resolvers.</p>
     </div>
     <div class="feature">
       <div class="feature-icon icon-yellow">🧾</div>
@@ -731,9 +739,14 @@
       <p>Automatic abort if the live cart price drifts &gt;5% from the resolved quote. No surprise overcharges.</p>
     </div>
     <div class="feature">
+      <div class="feature-icon icon-teal">🔑</div>
+      <h3>Bearer auth + rate limits</h3>
+      <p>Per-key token-bucket rate limiting. Each API key maps to an enterprise account in the append-only Postgres ledger.</p>
+    </div>
+    <div class="feature">
       <div class="feature-icon icon-teal">⛓️</div>
       <h3>x402 USDC payment</h3>
-      <p>Second payment rail behind the same <code>/buy/</code> endpoint. Agents that hold stablecoins pay directly — no Stripe handle, no card on file. PoC today; settles on Base.</p>
+      <p>Second payment rail behind the same tool surface. Agents that hold stablecoins pay directly — no Stripe handle, no card on file. PoC today; settles on Base.</p>
     </div>
   </div>
 </section>
