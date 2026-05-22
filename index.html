@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kaimo — Give your AI agent a checkout.</title>
+<meta name="description" content="One API call. Every shop. kaimo routes your agent's order to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD store. UK merchant-of-record with Stripe + x402 USDC payment rails.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0a0a0f;
+    --surface:  #111118;
+    --border:   #1e1e2e;
+    --muted:    #3a3a5c;
+    --text:     #e8e8f0;
+    --sub:      #8888aa;
+    --accent:   #6c63ff;
+    --accent2:  #00d4aa;
+    --danger:   #ff4d6d;
+    --mono:     ui-monospace, Menlo, 'Cascadia Code', monospace;
+    --sans:     -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    --radius:   12px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 40px;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: var(--sub);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent);
+    color: #fff !important;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: opacity .2s !important;
+  }
+  .nav-cta:hover { opacity: .85; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* gradient orbs */
+  .hero::before, .hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    pointer-events: none;
+  }
+  .hero::before {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,99,255,.18) 0%, transparent 70%);
+    top: -100px; left: -100px;
+  }
+  .hero::after {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,170,.12) 0%, transparent 70%);
+    bottom: 0; right: -100px;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(108,99,255,.12);
+    border: 1px solid rgba(108,99,255,.3);
+    color: #a8a4ff;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 28px;
+  }
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .5; transform: scale(1.4); }
+  }
+
+  h1 {
+    font-size: clamp(36px, 6vw, 72px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    max-width: 900px;
+  }
+  h1 .grad {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--sub);
+    max-width: 540px;
+    margin-bottom: 48px;
+    line-height: 1.7;
+  }
+
+  /* waitlist form */
+  .waitlist-form {
+    display: flex; gap: 10px;
+    max-width: 440px; width: 100%;
+    margin-bottom: 20px;
+  }
+  .waitlist-form input[type=email] {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    padding: 13px 18px;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .waitlist-form input[type=email]::placeholder { color: var(--muted); }
+  .waitlist-form input[type=email]:focus { border-color: var(--accent); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #9b6bff);
+    color: #fff;
+    border: none;
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity .2s, transform .15s;
+  }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .waitlist-note { font-size: 12px; color: var(--muted); }
+  .waitlist-note a { color: var(--sub); }
+
+  .form-status {
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 20px;
+    transition: opacity .3s;
+  }
+  .form-status.success { color: var(--accent2); }
+  .form-status.error   { color: var(--danger); }
+
+  /* ── CODE PREVIEW ── */
+  .code-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    max-width: 700px;
+    width: 100%;
+    margin-top: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .code-preview::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .code-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .c-key    { color: #a8a4ff; }
+  .c-str    { color: #7cdfb3; }
+  .c-brace  { color: var(--sub); }
+  .c-num    { color: #f7c873; }
+  .c-cmt    { color: var(--muted); font-style: italic; }
+  .c-fn     { color: #ff9f7e; }
+
+  /* ── SECTION LAYOUT ── */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 100px 24px;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  h2 {
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 18px;
+    color: var(--sub);
+    max-width: 560px;
+    line-height: 1.7;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2px;
+    margin-top: 64px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .step {
+    background: var(--surface);
+    padding: 36px 32px;
+    position: relative;
+    transition: background .2s;
+  }
+  .step:hover { background: #16161f; }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .step h3 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    margin-bottom: 10px;
+  }
+  .step p { font-size: 14px; color: var(--sub); line-height: 1.7; }
+
+  /* ── FEATURES ── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 64px;
+  }
+  .feature {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    transition: border-color .2s, transform .2s;
+  }
+  .feature:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .feature h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -.3px;
+  }
+  .feature p { font-size: 14px; color: var(--sub); line-height: 1.7; }
+
+  .icon-purple { background: rgba(108,99,255,.15); }
+  .icon-teal   { background: rgba(0,212,170,.15); }
+  .icon-orange { background: rgba(255,159,126,.15); }
+  .icon-pink   { background: rgba(255,77,109,.15); }
+  .icon-yellow { background: rgba(247,200,115,.15); }
+  .icon-blue   { background: rgba(100,180,255,.15); }
+
+  /* ── MARKETS ── */
+  .markets {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-top: 40px;
+  }
+  .market-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sub);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .market-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .dot-live    { background: var(--accent2); }
+  .dot-coming  { background: var(--muted); }
+
+  /* ── CTA BOTTOM ── */
+  .cta-section {
+    text-align: center;
+    padding: 120px 24px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(108,99,255,.12) 0%, transparent 70%);
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .cta-section h2 { max-width: 600px; margin: 0 auto 16px; }
+  .cta-section .section-sub { margin: 0 auto 48px; }
+  .cta-form {
+    display: flex; gap: 10px; justify-content: center;
+    max-width: 440px; margin: 0 auto 16px;
+  }
+  .cta-form input[type=email] {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    padding: 13px 18px;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .cta-form input[type=email]::placeholder { color: var(--muted); }
+  .cta-form input[type=email]:focus { border-color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--muted);
+    max-width: 100%;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--sub); }
+  .footer-links { display: flex; gap: 24px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .waitlist-form, .cta-form { flex-direction: column; }
+    .btn-primary { width: 100%; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    height: 1px;
+    background: var(--border);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── TOKEN SECTION ── */
+  .token-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 64px;
+  }
+  @media (max-width: 700px) { .token-split { grid-template-columns: 1fr; } }
+
+  .token-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .token-panel.before { opacity: .75; }
+  .token-panel.after  {
+    border-color: rgba(108,99,255,.5);
+    box-shadow: 0 0 40px rgba(108,99,255,.08);
+  }
+  .token-panel.after::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .tp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .tp-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tp-label.good { color: var(--accent2); }
+  .tp-counter {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .tp-counter.high  { background: rgba(255,77,109,.15); color: #ff9faf; }
+  .tp-counter.low   { background: rgba(0,212,170,.15);  color: var(--accent2); }
+
+  .tool-list { display: flex; flex-direction: column; gap: 8px; }
+  .tool-row {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--sub);
+  }
+  .tool-row .ti { color: var(--muted); font-size: 11px; margin-left: auto; }
+  .tool-row.highlight {
+    border-color: rgba(108,99,255,.4);
+    background: rgba(108,99,255,.06);
+    color: var(--text);
+  }
+  .tool-row.highlight .ti { color: var(--accent2); }
+
+  .token-saving {
+    margin-top: 48px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 36px;
+  }
+  @media (max-width: 700px) { .token-saving { flex-direction: column; gap: 20px; } }
+  .ts-stat {
+    text-align: center;
+    flex: 1;
+  }
+  .ts-num {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .ts-desc { font-size: 13px; color: var(--sub); margin-top: 6px; }
+  .ts-divider { width: 1px; height: 60px; background: var(--border); }
+  @media (max-width: 700px) { .ts-divider { width: 60px; height: 1px; } }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">kai<span>mo</span></a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#tokens">Token savings</a>
+    <a href="#features">Features</a>
+    <a href="https://github.com/kaimo-no/kaimo-go">GitHub</a>
+    <a href="#waitlist" class="nav-cta">Get access</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge">
+    <span class="badge-dot"></span>
+    Private beta — UK
+  </div>
+  <h1>Give your AI agent<br><span class="grad">a checkout.</span></h1>
+  <p class="hero-sub">
+    One tool. Every shop. Your agent posts a product URL — we route to Shopify,
+    WooCommerce, Squarespace, Amazon UK, or any JSON-LD store. No per-marketplace
+    schemas burning tokens on every inference call.
+  </p>
+
+  <form class="waitlist-form" id="hero-form"
+        action="https://formspree.io/f/REPLACE_WITH_FORMSPREE_ID"
+        method="POST"
+        onsubmit="submitWaitlist(event, 'hero-status', this)">
+    <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
+    <input type="hidden" name="source" value="hero">
+    <input type="hidden" name="_subject" value="kaimo waitlist signup (hero)">
+    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+    <button type="submit" class="btn-primary" id="hero-btn">Join waitlist</button>
+  </form>
+  <p class="form-status" id="hero-status"></p>
+  <p class="waitlist-note">No spam. API key sent when ready.</p>
+
+  <div class="code-preview">
+    <div class="code-label">POST /buy/</div>
+<pre><span class="c-brace">{</span>
+  <span class="c-key">"product_url"</span><span class="c-brace">:</span> <span class="c-str">"https://www.amazon.co.uk/dp/B08N5WRWNW"</span><span class="c-brace">,</span>
+  <span class="c-key">"quantity"</span><span class="c-brace">:</span> <span class="c-num">1</span><span class="c-brace">,</span>
+  <span class="c-key">"buyer"</span><span class="c-brace">: {</span>
+    <span class="c-key">"first_name"</span><span class="c-brace">:</span> <span class="c-str">"Alice"</span><span class="c-brace">,</span>
+    <span class="c-key">"email"</span><span class="c-brace">:</span>      <span class="c-str">"alice@example.com"</span><span class="c-brace">,</span>
+    <span class="c-key">"address1"</span><span class="c-brace">:</span>   <span class="c-str">"10 Downing Street"</span><span class="c-brace">,</span>
+    <span class="c-key">"city"</span><span class="c-brace">:</span>       <span class="c-str">"London"</span><span class="c-brace">,</span>
+    <span class="c-key">"postcode"</span><span class="c-brace">:</span>   <span class="c-str">"SW1A 2AA"</span><span class="c-brace">,</span>
+    <span class="c-key">"country"</span><span class="c-brace">:</span>    <span class="c-str">"GB"</span>
+  <span class="c-brace">}</span>
+<span class="c-brace">}</span>
+
+<span class="c-cmt">// → { "order_id": "ord_…", "status": "placed", "pricing": { … } }</span></pre>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">How it works</div>
+  <h2>From URL to doorstep<br>in milliseconds.</h2>
+  <p class="section-sub">Your agent stays focused on decisions. We handle the rest.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01 — Resolve</div>
+      <h3>Product URL → structured data</h3>
+      <p>We extract title, price, variant ID, and ASIN from any supported marketplace — no scraper setup required.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02 — Quote</div>
+      <h3>Transparent pricing</h3>
+      <p>Subtotal + shipping returned before charge. Drift &gt;5% from resolver price aborts the order automatically.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03 — Charge</div>
+      <h3>Stripe or x402 USDC</h3>
+      <p>Authorise the buyer via Stripe (manual capture) or x402 USDC. Same endpoint, same response shape — your agent picks the rail by header.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04 — Place</div>
+      <h3>Order placed at merchant</h3>
+      <p>Shopify orders land in a prefilled cart permalink ready for checkout. Amazon UK and queued sources finish via the kaimo merchant-of-record account, paid by a single-use Stripe Issuing virtual card.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TOKEN EFFICIENCY -->
+<section id="tokens">
+  <div class="section-label">Token efficiency</div>
+  <h2>One tool definition.<br><span style="color:var(--accent2)">Every shop.</span></h2>
+  <p class="section-sub">
+    LLMs pay the token cost of every tool schema on <em>every</em> inference call —
+    not just once. Fewer tools means cheaper, faster agents at scale.
+  </p>
+
+  <div class="token-split">
+    <div class="token-panel before">
+      <div class="tp-header">
+        <span class="tp-label">Without kaimo</span>
+        <span class="tp-counter high">8 tools / shop</span>
+      </div>
+      <div class="tool-list">
+        <div class="tool-row">🛒 search_products<span class="ti">~180 tok</span></div>
+        <div class="tool-row">🛒 get_product<span class="ti">~140 tok</span></div>
+        <div class="tool-row">🛒 compare_prices<span class="ti">~160 tok</span></div>
+        <div class="tool-row">🛒 add_to_cart<span class="ti">~150 tok</span></div>
+        <div class="tool-row">🛒 build_cart<span class="ti">~170 tok</span></div>
+        <div class="tool-row">🛒 prepare_checkout<span class="ti">~210 tok</span></div>
+        <div class="tool-row">🛒 list_stores<span class="ti">~120 tok</span></div>
+        <div class="tool-row">🛒 get_consent_log<span class="ti">~130 tok</span></div>
+        <div class="tool-row" style="opacity:.45">× every store you support<span class="ti">···</span></div>
+      </div>
+    </div>
+
+    <div class="token-panel after">
+      <div class="tp-header">
+        <span class="tp-label good">With kaimo</span>
+        <span class="tp-counter low">3 tools, total</span>
+      </div>
+      <div class="tool-list">
+        <div class="tool-row highlight">🔍 kaimo_preview<span class="ti">quote, no charge</span></div>
+        <div class="tool-row highlight">🛒 kaimo_buy<span class="ti">place order</span></div>
+        <div class="tool-row highlight">📦 kaimo_status<span class="ti">poll progress</span></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:20px;line-height:1.7">
+        Routing to Shopify, WooCommerce, Squarespace, Amazon UK, or any JSON-LD
+        store happens server-side — invisible to the model.
+      </p>
+    </div>
+  </div>
+
+  <div class="token-saving">
+    <div class="ts-stat">
+      <div class="ts-num">88.94%</div>
+      <div class="ts-desc">aggregate token reduction (locked by the eval gate ≥40%)</div>
+    </div>
+    <div class="ts-divider"></div>
+    <div class="ts-stat">
+      <div class="ts-num">3</div>
+      <div class="ts-desc">MCP tools to register, total</div>
+    </div>
+    <div class="ts-divider"></div>
+    <div class="ts-stat">
+      <div class="ts-num">∞</div>
+      <div class="ts-desc">shops reachable without schema changes</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Features</div>
+  <h2>Everything an agent<br>needs to buy.</h2>
+  <p class="section-sub">Built for LLM tool-use. OpenAPI + MCP server included.</p>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon icon-purple">🛒</div>
+      <h3>Five source families</h3>
+      <p>Shopify, WooCommerce, Squarespace, Amazon UK, plus a Schema.org JSON-LD fallback that covers Wix and most modern storefronts. One endpoint, five resolvers.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-teal">⚡</div>
+      <h3>Single API call</h3>
+      <p>POST a product URL and a buyer dict. Preview endpoint returns a quote without charging. No session state, no cart bookkeeping.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-orange">🔌</div>
+      <h3>MCP server included</h3>
+      <p>Stdio MCP server exposes three tools — <code>kaimo_preview</code>, <code>kaimo_buy</code>, <code>kaimo_status</code>. Drops into Claude Code, Claude Desktop, Cursor with a single config line. Responses inline product image + markdown purchase card.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-blue">🔑</div>
+      <h3>Bearer auth + rate limits</h3>
+      <p>Per-key token-bucket rate limiting. Each API key maps to an enterprise account in the append-only Postgres ledger.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-yellow">🧾</div>
+      <h3>Merchant-of-record</h3>
+      <p>Buyer pays Stripe; we pay the merchant with a single-use Stripe Issuing virtual card scoped to the quote total. UK VAT on the service fee is on us — no marketplace account needed on your end.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-pink">🛡️</div>
+      <h3>Price drift protection</h3>
+      <p>Automatic abort if the live cart price drifts &gt;5% from the resolved quote. No surprise overcharges.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon icon-teal">⛓️</div>
+      <h3>x402 USDC payment</h3>
+      <p>Second payment rail behind the same <code>/buy/</code> endpoint. Agents that hold stablecoins pay directly — no Stripe handle, no card on file. PoC today; settles on Base.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- MARKETS -->
+<section>
+  <div class="section-label">Supported markets</div>
+  <h2>Where we ship today.</h2>
+  <p class="section-sub">UK-first. US and IE shipping supported. More regions on the roadmap.</p>
+
+  <div class="markets">
+    <div class="market-pill"><span class="dot dot-live"></span> Shopify stores</div>
+    <div class="market-pill"><span class="dot dot-live"></span> WooCommerce stores</div>
+    <div class="market-pill"><span class="dot dot-live"></span> Squarespace stores</div>
+    <div class="market-pill"><span class="dot dot-live"></span> JSON-LD sources (Wix &amp; co.)</div>
+    <div class="market-pill"><span class="dot dot-coming"></span> Amazon UK (placer in v2)</div>
+    <div class="market-pill"><span class="dot dot-coming"></span> Amazon DE (coming)</div>
+    <div class="market-pill"><span class="dot dot-coming"></span> ASOS (coming)</div>
+    <div class="market-pill"><span class="dot dot-coming"></span> Zalando (coming)</div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CTA -->
+<div class="cta-section" id="waitlist">
+  <div class="section-label" style="margin-bottom:14px">Early access</div>
+  <h2>Be first to build<br>with kaimo.</h2>
+  <p class="section-sub">Join the waitlist. We'll send your API key when your slot opens.</p>
+
+  <form class="cta-form" id="cta-form"
+        action="https://formspree.io/f/REPLACE_WITH_FORMSPREE_ID"
+        method="POST"
+        onsubmit="submitWaitlist(event, 'cta-status', this)">
+    <input type="email" name="email" placeholder="you@company.com" required autocomplete="email">
+    <input type="hidden" name="source" value="cta">
+    <input type="hidden" name="_subject" value="kaimo waitlist signup (cta)">
+    <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+    <button type="submit" class="btn-primary" id="cta-btn">Get access</button>
+  </form>
+  <p class="form-status" id="cta-status"></p>
+  <p class="waitlist-note" style="text-align:center">Developer billing. Service fee owed by you, not the buyer.</p>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 kaimo. UK agent-commerce platform.</span>
+  <div class="footer-links">
+    <a href="https://github.com/kaimo-no/kaimo-go">GitHub</a>
+    <a href="https://github.com/kaimo-no/kaimo-go/blob/main/README.md">Docs</a>
+    <a href="mailto:hello@kaimo.dev">Contact</a>
+  </div>
+</footer>
+
+<script>
+async function submitWaitlist(e, statusId, form) {
+  e.preventDefault();
+  const emailInput = form.querySelector('input[type=email]');
+  const btn = form.querySelector('button[type=submit]');
+  const status = document.getElementById(statusId);
+
+  const email = emailInput.value.trim();
+  if (!email) return;
+
+  // honeypot — bots filling the hidden _gotcha field get silently dropped
+  const gotcha = form.querySelector('input[name=_gotcha]');
+  if (gotcha && gotcha.value) return;
+
+  // form action must be a real Formspree endpoint
+  if (form.action.includes('REPLACE_WITH_FORMSPREE_ID')) {
+    status.className = 'form-status error';
+    status.textContent = 'Waitlist not wired yet — replace REPLACE_WITH_FORMSPREE_ID in index.html.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Joining…';
+  status.className = 'form-status';
+  status.textContent = '';
+
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(form),
+    });
+    if (res.ok) {
+      status.className = 'form-status success';
+      status.textContent = "You're on the list. We'll be in touch.";
+      emailInput.value = '';
+      btn.textContent = 'Done ✓';
+    } else {
+      const body = await res.json().catch(() => ({}));
+      const msg = body.errors && body.errors[0] && body.errors[0].message;
+      status.className = 'form-status error';
+      status.textContent = msg || 'Something went wrong. Try again.';
+      btn.disabled = false;
+      btn.textContent = btn.id === 'hero-btn' ? 'Join waitlist' : 'Get access';
+    }
+  } catch {
+    status.className = 'form-status error';
+    status.textContent = 'Network error. Try again.';
+    btn.disabled = false;
+    btn.textContent = btn.id === 'hero-btn' ? 'Join waitlist' : 'Get access';
+  }
+}
+</script>
+</body>
+</html>
